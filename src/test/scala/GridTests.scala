@@ -55,6 +55,10 @@ class GridTests extends FlatSpec {
 
   "Grid#fromLines" should "correctly create a grid with the correct across clue lengths" in {
     val grid = Grid.fromLines(Lines)
+
+    grid.AcrossNumbersToCoords.toList.sortBy(x => x._1).foreach(println(_))
+    grid.DownNumbersToCoords.toList.sortBy(x => x._1).foreach(println(_))
+
     for {
       clue <- Clues
       if clue.clueType == ACROSS
