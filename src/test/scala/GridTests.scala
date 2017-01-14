@@ -64,20 +64,20 @@ class GridTests extends FlatSpec {
   "Grid#fromLines" should "create a grid with the correct clue intersections for 1a" in {
     val actual = ExampleGrid.getIntersectionsForAcrossClue(1).sortBy(_.acrossIndex)
     val expected = Seq(
-      Intersection(1, 2, 0),
-      Intersection(3, 3, 0),
-      Intersection(5, 4, 0))
+      Intersection(1, 1, 2, 0),
+      Intersection(1, 3, 3, 0),
+      Intersection(1, 5, 4, 0))
     assert(actual == expected)
   }
 
   "Grid#fromLines" should "create a grid with the correct clue intersections for 12a" in {
     val actual = ExampleGrid.getIntersectionsForAcrossClue(12).sortBy(_.acrossIndex)
     val expected = Seq(
-      Intersection(0, 3, 4),
-      Intersection(2, 13, 0),
-      Intersection(4, 5, 4),
-      Intersection(6, 6, 4),
-      Intersection(8, 7, 4))
+      Intersection(12, 0, 3, 4),
+      Intersection(12, 2, 13, 0),
+      Intersection(12, 4, 5, 4),
+      Intersection(12, 6, 6, 4),
+      Intersection(12, 8, 7, 4))
     assert(actual == expected)
   }
 }

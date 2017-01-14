@@ -29,19 +29,18 @@ class Grid(size: Int, spaces: Set[Coords]) {
   final val AcrossNumbersToCoords = clueNumbersToCoords._1
   final val DownNumbersToCoords = clueNumbersToCoords._2
 
-  def getIntersectionsForAcrossClue(number: Int): Seq[Intersection] = {
-    val acrossClueCoordsListWithIndices = getCoordsList(ACROSS, number).zipWithIndex
-    (DownNumbersToCoords flatMap {
-      case (downClueNumber, _) =>
-        val downClueCoordsListWithIndices = getCoordsList(DOWN, downClueNumber).zipWithIndex
-        downClueCoordsListWithIndices flatMap {
-          case (downCoords, downIndex) =>
-            acrossClueCoordsListWithIndices collectFirst {
-              case (acrossCoords, acrossIndex) if downCoords == acrossCoords =>
-                Intersection(acrossIndex, downClueNumber, downIndex)
-            }
-        }
-    }).toSeq
+  def getIntersectionsForAcrossClue(acrossClueNumber: Int): Seq[Intersection] = {
+    val acrossClueCoordsListWithIndices = getCoordsList(ACROSS, acrossClueNumber).zipWithIndex
+    val maybeIntersections = for {
+      downClueNumber <- DownNumbersToCoords.keys.toSeq
+      downClueCoordsListWithIndices = getCoordsList(DOWN, downClueNumber).zipWithIndex
+      (downCoords, downIndex) <- downClueCoordsListWithIndices
+      maybeIntersection = acrossClueCoordsListWithIndices collectFirst {
+        case (acrossCoords, acrossIndex) if acrossCoords == downCoords =>
+          Intersection(acrossClueNumber, acrossIndex, downClueNumber, downIndex)
+      }
+    } yield maybeIntersection
+    maybeIntersections.flatten
   }
 
   private def getCoordsList(clueType: ClueType.Value, number: Int): Seq[Coords] = {

@@ -1,1 +1,1 @@
-case class Intersection(acrossIndex: Int, downClueNumber: Int, downIndex: Int)
+case class Intersection(acrossClueNumber: Int, acrossIndex: Int, downClueNumber: Int, downIndex: Int)
