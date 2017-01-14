@@ -29,21 +29,19 @@ class Grid(size: Int, spaces: Set[Coords]) {
   final val AcrossNumbersToCoords = clueNumbersToCoords._1
   final val DownNumbersToCoords = clueNumbersToCoords._2
 
-  def getIntersectionsForAcrossClue(number: Int): Seq[(Int, Int, Int)] = {
+  def getIntersectionsForAcrossClue(number: Int): Seq[Intersection] = {
     val acrossClueCoordsListWithIndices = getCoordsList(ACROSS, number).zipWithIndex
-    val v1 = DownNumbersToCoords flatMap {
+    (DownNumbersToCoords flatMap {
       case (downClueNumber, _) =>
         val downClueCoordsListWithIndices = getCoordsList(DOWN, downClueNumber).zipWithIndex
-        val v2 = downClueCoordsListWithIndices map {
+        downClueCoordsListWithIndices flatMap {
           case (downCoords, downIndex) =>
             acrossClueCoordsListWithIndices collectFirst {
-              case (acrossCoords, acrossIndex) if downCoords == acrossCoords => (acrossIndex, downClueNumber, downIndex)
+              case (acrossCoords, acrossIndex) if downCoords == acrossCoords =>
+                Intersection(acrossIndex, downClueNumber, downIndex)
             }
         }
-        val v3 = v2.flatten
-        v3
-    }
-    v1.toSeq
+    }).toSeq
   }
 
   private def getCoordsList(clueType: ClueType.Value, number: Int): Seq[Coords] = {
