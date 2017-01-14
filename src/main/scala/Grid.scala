@@ -2,10 +2,14 @@ import ClueType._
 
 class Grid(size: Int, spaces: Set[Coords]) {
 
-  def answerLength(clueType: ClueType.Value, x: Int, y: Int): Int = {
-    val coords = clueType match {
-      case ACROSS => for { col <- x until size } yield Coords(col, y)
-      case DOWN => for { row <- y until size } yield Coords(x, row)
+  def answerLength(clue: Clue): Int = {
+    val coords = clue.clueType match {
+      case ACROSS =>
+        val v1 = AcrossNumbersToCoords(clue.number)
+        for { col <- v1.x until size } yield Coords(col, v1.y)
+      case DOWN =>
+        val v1 = DownNumbersToCoords(clue.number)
+        for { row <- v1.y until size } yield Coords(v1.x, row)
     }
     coords prefixLength spaces.contains
   }
@@ -45,8 +49,8 @@ object Grid {
   def fromLines(lines: Seq[String]): Grid = {
     val size = lines.length
     val allCoords = for {
-      y <- 0 until size
       x <- 0 until size
+      y <- 0 until size
     } yield Coords(x, y)
     val spaces = allCoords filter (coords => lines(coords.y)(coords.x) == SPACE)
     new Grid(size, spaces.toSet)
