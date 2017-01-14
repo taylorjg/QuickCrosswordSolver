@@ -2,18 +2,6 @@ import ClueType._
 
 class Grid(size: Int, spaces: Set[Coords]) {
 
-  def answerLength(clue: Clue): Int = {
-    val coords = clue.clueType match {
-      case ACROSS =>
-        val v1 = AcrossNumbersToCoords(clue.number)
-        for { col <- v1.x until size } yield Coords(col, v1.y)
-      case DOWN =>
-        val v1 = DownNumbersToCoords(clue.number)
-        for { row <- v1.y until size } yield Coords(v1.x, row)
-    }
-    coords prefixLength spaces.contains
-  }
-
   private final val LastRow = size - 1
   private final val LastCol = size - 1
 
@@ -40,6 +28,36 @@ class Grid(size: Int, spaces: Set[Coords]) {
 
   final val AcrossNumbersToCoords = clueNumbersToCoords._1
   final val DownNumbersToCoords = clueNumbersToCoords._2
+
+  def getIntersectionsForAcrossClue(number: Int): Seq[(Int, Int, Int)] = {
+    val acrossClueCoordsListWithIndices = getCoordsList(ACROSS, number).zipWithIndex
+    val v1 = DownNumbersToCoords flatMap {
+      case (downClueNumber, _) =>
+        val downClueCoordsListWithIndices = getCoordsList(DOWN, downClueNumber).zipWithIndex
+        val v2 = downClueCoordsListWithIndices map {
+          case (downCoords, downIndex) =>
+            acrossClueCoordsListWithIndices collectFirst {
+              case (acrossCoords, acrossIndex) if downCoords == acrossCoords => (acrossIndex, downClueNumber, downIndex)
+            }
+        }
+        val v3 = v2.flatten
+        v3
+    }
+    v1.toSeq
+  }
+
+  private def getCoordsList(clueType: ClueType.Value, number: Int): Seq[Coords] = {
+    val coords = clueType match {
+      case ACROSS =>
+        val startCoords = AcrossNumbersToCoords(number)
+        for {col <- startCoords.x until size} yield Coords(col, startCoords.y)
+      case DOWN =>
+        val startCoords = DownNumbersToCoords(number)
+        for {row <- startCoords.y until size} yield Coords(startCoords.x, row)
+    }
+    val length = coords prefixLength spaces.contains
+    coords take length
+  }
 }
 
 object Grid {

@@ -3,7 +3,7 @@ import ClueType._
 
 class GridTests extends FlatSpec {
 
-  private final val Input =
+  private final val Lines =
     """
       |x------x-----
       |-x-x-x-x-x-x-
@@ -18,11 +18,11 @@ class GridTests extends FlatSpec {
       |---x---------
       |-x-x-x-x-x-x-
       |-----x------x
-    """.stripMargin
+    """.stripMargin split "\n" map (_.trim) filter (_.nonEmpty)
 
-  private final val Lines = Input split "\n" map (_.trim) filter (_.nonEmpty)
+  private final val ExampleGrid = Grid.fromLines(Lines)
 
-  private final val Clues = Seq(
+  private final val ExampleClues = Seq(
     Clue(ACROSS, 1, "Small wheel", 6),
     Clue(ACROSS, 5, "Be burdensome", 5),
     Clue(ACROSS, 9, "Rules of behaviour", 9),
@@ -53,13 +53,31 @@ class GridTests extends FlatSpec {
     Clue(DOWN, 24, "Cry", 3)
   )
 
-  "Grid#fromLines" should "correctly create a grid with the correct across clue numbers" in {
-    val grid = Grid.fromLines(Lines)
-    assert(grid.AcrossNumbersToCoords.keys.toSet == Clues.filter(_.clueType == ACROSS).map(_.number).toSet)
+  "Grid#fromLines" should "create a grid with the correct across clue numbers" in {
+    assert(ExampleGrid.AcrossNumbersToCoords.keys.toSet == ExampleClues.filter(_.clueType == ACROSS).map(_.number).toSet)
   }
 
-  "Grid#fromLines" should "correctly create a grid with the correct down clue numbers" in {
-    val grid = Grid.fromLines(Lines)
-    assert(grid.DownNumbersToCoords.keys.toSet == Clues.filter(_.clueType == DOWN).map(_.number).toSet)
+  "Grid#fromLines" should "create a grid with the correct down clue numbers" in {
+    assert(ExampleGrid.DownNumbersToCoords.keys.toSet == ExampleClues.filter(_.clueType == DOWN).map(_.number).toSet)
+  }
+
+  "Grid#fromLines" should "create a grid with the correct clue intersections for 1a" in {
+    val actual = ExampleGrid.getIntersectionsForAcrossClue(1).sortBy(_._1)
+    val expected = Seq(
+      (1, 2, 0),
+      (3, 3, 0),
+      (5, 4, 0))
+    assert(actual == expected)
+  }
+
+  "Grid#fromLines" should "create a grid with the correct clue intersections for 12a" in {
+    val actual = ExampleGrid.getIntersectionsForAcrossClue(12).sortBy(_._1)
+    val expected = Seq(
+      (0, 3, 4),
+      (2, 13, 0),
+      (4, 5, 4),
+      (6, 6, 4),
+      (8, 7, 4))
+    assert(actual == expected)
   }
 }
